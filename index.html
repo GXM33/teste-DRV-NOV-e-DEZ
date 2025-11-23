@@ -256,29 +256,29 @@
             <!-- ABA 2: BUSCAR POR PESSOA -->
             <div class="tab-content">
                 <label for="person-select">Selecione uma pessoa:</label>
-                <select id="person-select" onchange="searchByPerson()">
+                <select id="person-select" onchange="handlePersonSearch()">
                     <option value="">-- Escolha uma pessoa --</option>
-                    <option>Insp. Acauã</option>
-                    <option>Esc. Fernanda Piazza</option>
-                    <option>Insp. Cristiano Soletti</option>
-                    <option>Insp. Teresinha Carivali</option>
-                    <option>Insp. Thiago Meireles</option>
-                    <option>Esc. César da Costa</option>
-                    <option>Insp. Vanessa Trindade</option>
-                    <option>Insp. Juliano Bonacina</option>
-                    <option>Insp. Guilherme Mello</option>
-                    <option>Insp. Tais Boesing</option>
-                    <option>Esc. Jefferson Antoniol</option>
-                    <option>Esc. Luciana Bortoli</option>
-                    <option>Insp. Edna Moraes</option>
-                    <option>Esc. Anderson Saraiva</option>
-                    <option>Insp. Lucas Loss</option>
-                    <option>Insp. Alexandre Brozoza</option>
-                    <option>Esc. Dagoberto O. das Virgens</option>
-                    <option>Insp. Thássia Guterres</option>
-                    <option>Insp. Juliana Tremper</option>
-                    <option>Esc. Cátia Fortunato</option>
-                    <option>Insp. Edmilson Melo</option>
+                    <option value="Cau">Insp. Acauã</option>
+                    <option value="Saraiva">Esc. Anderson Saraiva</option>
+                    <option value="Brozoza">Insp. Alexandre Brozoza</option>
+                    <option value="Cátia">Esc. Cátia Fortunato</option>
+                    <option value="Cristiano">Insp. Cristiano Soletti</option>
+                    <option value="César">Esc. César da Costa</option>
+                    <option value="Dago">Esc. Dagoberto O. das Virgens</option>
+                    <option value="Melo">Insp. Edmilson Melo</option>
+                    <option value="Edna">Insp. Edna Moraes</option>
+                    <option value="Piazza">Esc. Fernanda Piazza</option>
+                    <option value="Gui Mello">Insp. Guilherme Mello</option>
+                    <option value="Jeff">Esc. Jefferson Antoniol</option>
+                    <option value="Juliana">Insp. Juliana Tremper</option>
+                    <option value="Bona">Insp. Juliano Bonacina</option>
+                    <option value="Luciana">Esc. Luciana Bortoli</option>
+                    <option value="Loss">Insp. Lucas Loss</option>
+                    <option value="Tais">Insp. Tais Boesing</option>
+                    <option value="Teresinha">Insp. Teresinha Carivali</option>
+                    <option value="Thiago">Insp. Thiago Meireles</option>
+                    <option value="Thássia">Insp. Thássia Guterres</option>
+                    <option value="Vanessa">Insp. Vanessa Trindade</option>
                 </select>
             </div>
 
@@ -339,30 +339,6 @@
             "Juliana": "(51) 993337587",
             "Cátia": "(51) 985744501",
             "Melo": "(51) 983190815"
-        };
-
-        const peopleShortMap = {
-            "Insp. Acauã": "Cau",
-            "Esc. Fernanda Piazza": "Piazza",
-            "Insp. Cristiano Soletti": "Cristiano",
-            "Insp. Teresinha Carivali": "Teresinha",
-            "Insp. Thiago Meireles": "Thiago",
-            "Esc. César da Costa": "César",
-            "Insp. Vanessa Trindade": "Vanessa",
-            "Insp. Juliano Bonacina": "Bona",
-            "Insp. Guilherme Mello": "Gui Mello",
-            "Insp. Tais Boesing": "Tais",
-            "Esc. Jefferson Antoniol": "Jeff",
-            "Esc. Luciana Bortoli": "Luciana",
-            "Insp. Edna Moraes": "Edna",
-            "Esc. Anderson Saraiva": "Saraiva",
-            "Insp. Lucas Loss": "Loss",
-            "Insp. Alexandre Brozoza": "Brozoza",
-            "Esc. Dagoberto O. das Virgens": "Dago",
-            "Insp. Thássia Guterres": "Thássia",
-            "Insp. Juliana Tremper": "Juliana",
-            "Esc. Cátia Fortunato": "Cátia",
-            "Insp. Edmilson Melo": "Melo"
         };
 
         const schedule = {
@@ -443,10 +419,8 @@
             const contents = document.querySelectorAll('.tab-content');
             const buttons = document.querySelectorAll('.tab-btn');
             
-            contents.forEach((c, i) => {
-                c.classList.remove('active');
-                buttons[i].classList.remove('active');
-            });
+            contents.forEach(c => c.classList.remove('active'));
+            buttons.forEach(b => b.classList.remove('active'));
             
             contents[index].classList.add('active');
             buttons[index].classList.add('active');
@@ -490,50 +464,96 @@
             document.getElementById('output').value = buildMessage(date);
         }
 
-        function searchByPerson() {
-            const personFull = document.getElementById('person-select').value;
-            if (!personFull) return;
+        function getDayOfWeek(dateStr) {
+            const [dia, mes, ano] = dateStr.split('/');
+            const date = new Date(ano, mes - 1, dia);
+            const days = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];
+            return days[date.getDay()];
+        }
+
+        function buildMessageWithDay(date) {
+            const escala = schedule[date];
+            if (!escala) return "";
             
-            const personShort = peopleShortMap[personFull];
+            const dayOfWeek = getDayOfWeek(date);
+            const [sa01, sa02, saNac] = escala;
+            const nome1 = nameMap[sa01];
+            const fone1 = phoneMap[sa01];
+            const nome2 = nameMap[sa02];
+            const fone2 = phoneMap[sa02];
+            
+            let text = "*Sobreaviso DRV/DEIC*\n";
+            text += "Data: " + date + " (" + dayOfWeek + ")\n\n";
+            text += nome1 + "\n" + fone1 + "\n\n";
+            text += nome2 + "\n" + fone2 + "\n\n";
+            
+            if (saNac && saNac !== "") {
+                const nomeNac = nameMap[saNac];
+                const foneNac = phoneMap[saNac];
+                text += "NAC: " + nomeNac + "\n" + foneNac + "\n\n";
+            }
+            
+            text += "Chefe de SI: Com. Bruna Caldeira\n";
+            text += "(51) 99139-9403\n\n";
+            text += "Autoridade Policial:\n";
+            text += "Del. Jeiselaure de Souza\n";
+            text += "(51) 99145-8919";
+            
+            return text;
+        }
+
+        function handlePersonSearch() {
+            const personShort = document.getElementById('person-select').value;
+            const outputElement = document.getElementById('output');
+            
+            if (!personShort) {
+                outputElement.value = '';
+                return;
+            }
+            
             let result = '';
             let novCount = 0;
             let decCount = 0;
             let datesFound = [];
 
-            // Encontrar todas as datas e contar por mês
             for (let date in schedule) {
-                const escala = schedule[date];
-                const sa01 = escala[0];
-                const sa02 = escala[1];
-                const saNac = escala[2];
-                
-                if (sa01 === personShort || sa02 === personShort || saNac === personShort) {
-                    datesFound.push(date);
-                    if (date.includes("/11/")) {
-                        novCount++;
-                    } else if (date.includes("/12/")) {
-                        decCount++;
+                if (schedule.hasOwnProperty(date)) {
+                    const escala = schedule[date];
+                    const sa01 = escala[0];
+                    const sa02 = escala[1];
+                    const saNac = escala[2];
+                    
+                    if (sa01 === personShort || sa02 === personShort || saNac === personShort) {
+                        datesFound.push(date);
+                        if (date.includes("/11/")) {
+                            novCount++;
+                        } else if (date.includes("/12/")) {
+                            decCount++;
+                        }
                     }
                 }
             }
 
-            // Ordenar as datas de forma crescente
             datesFound = sortDates(datesFound);
 
-            // Adicionar resumo
+            if (datesFound.length === 0) {
+                result = "Nenhum sobreaviso encontrado para essa pessoa.";
+                outputElement.value = result;
+                return;
+            }
+
             result += "Novembro: " + novCount + " sobreavisos\n";
             result += "Dezembro: " + decCount + " sobreavisos\n\n";
             result += "════════════════════════════════════════\n\n";
 
-            // Gerar texto completo para cada dia em ordem crescente
             for (let i = 0; i < datesFound.length; i++) {
                 if (i > 0) {
                     result += "\n\n════════════════════════════════════════\n\n";
                 }
-                result += buildMessage(datesFound[i]);
+                result += buildMessageWithDay(datesFound[i]);
             }
             
-            document.getElementById('output').value = result;
+            outputElement.value = result;
         }
 
         function copyText() {
